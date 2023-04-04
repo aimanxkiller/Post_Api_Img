@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Post_Api_Img</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="filename_placeholder">Filename Placeholder</string>
+    <string name="imagePreview">ImagePreview</string>
+    <string name="url_placeholder">URL PLACEHOLDER</string>
+    <string name="urlView">URLVIEW</string>
+    <string name="restart">Restart</string>
+    <string name="upload">Upload</string>
+</resources>
