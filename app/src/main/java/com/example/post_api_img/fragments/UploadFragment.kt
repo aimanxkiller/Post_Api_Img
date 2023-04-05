@@ -19,9 +19,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.post_api_img.R
 import com.example.post_api_img.api.APIService
-import com.example.post_api_img.api.UploadStreamRequestBody
 import com.example.post_api_img.viewmodel.ViewModelUpload
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -33,6 +33,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import java.util.*
 
 
 @Suppress("DEPRECATION")
@@ -72,7 +73,12 @@ class UploadFragment : Fragment() {
         }
 
         btnUpload.setOnClickListener {
-            uploadFile()
+            if (imgUri != null) {
+                uploadFile()
+            }else
+            {
+                Toast.makeText(requireContext(),"NO IMG",Toast.LENGTH_SHORT).show()
+            }
         }
 
     }
@@ -97,14 +103,13 @@ class UploadFragment : Fragment() {
                 val apiService = retrofit.create(APIService::class.java)
 
                 Toast.makeText(requireContext(),"Im here",Toast.LENGTH_SHORT).show()
+                apiService.uploadFile(filePart)
 
-                val x = apiService.uploadFile(filePart)
-                Log.e("Output",x.toString())
-
+                findNavController().navigate(R.id.action_uploadFragment_to_previewFragment)
 
             }
             catch (e: Exception) {
-                Toast.makeText(requireContext(),"Im here $e",Toast.LENGTH_SHORT).show()
+                Log.e("Output","Error during uploading = $e")
                 return@launch
             }
             Log.d("MyActivity", "on finish upload file")

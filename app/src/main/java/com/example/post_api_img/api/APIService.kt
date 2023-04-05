@@ -16,6 +16,6 @@ interface APIService {
 
     @Multipart
     @POST("upload")
-    suspend fun uploadFile(@Part body: MultipartBody.Part):Call<Response>
+    suspend fun uploadFile(@Part body: MultipartBody.Part)
 
 }
