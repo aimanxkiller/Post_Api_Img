@@ -27,7 +27,6 @@ import com.example.post_api_img.UploadStreamRequestBody
 import com.example.post_api_img.viewmodel.ViewModelUpload
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -77,6 +76,9 @@ class UploadFragment : Fragment() {
         btnUpload.setOnClickListener {
 
             if (imgUri != null) {
+                btnCam.visibility = View.GONE
+                btnGallery.visibility = View.GONE
+                btnUpload.visibility = View.GONE
                 uploadFile()
             }else {
                 Toast.makeText(requireContext(),"NO IMG",Toast.LENGTH_SHORT).show()
@@ -88,10 +90,15 @@ class UploadFragment : Fragment() {
 
     //Upload File To API
     private fun uploadFile(){
-
+        progressBar.visibility = View.VISIBLE
+        progressBar.max = 10000
+        progressBar.progress = 0
         lifecycleScope.launch {
             val stream = requireContext().contentResolver.openInputStream(imgUri!!) ?: return@launch
-            val request = RequestBody.create("image/*".toMediaTypeOrNull(), stream.readBytes()) // read all bytes using kotlin extension
+            val request = UploadStreamRequestBody("image/*", stream, onUploadProgress = {
+                Log.d("MyActivity", "On upload progress $it")
+                progressBar.progress = it // Some ProgressBar
+            })
             val filePart = MultipartBody.Part.createFormData("file", "test.jpg", request)
 
             try {

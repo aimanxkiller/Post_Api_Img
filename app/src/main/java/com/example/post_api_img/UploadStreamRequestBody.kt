@@ -12,7 +12,7 @@ class UploadStreamRequestBody(
     private val mediaType: String,
     private val inputStream: InputStream,
     private val onUploadProgress: (Int) -> Unit,
-) : RequestBody() {
+) : RequestBody(){
 
     override fun contentLength(): Long = inputStream.available().toLong()
 
