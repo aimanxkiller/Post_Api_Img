@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingHorizontal="25dp"
     tools:context=".fragments.UploadFragment"
     tools:ignore="ButtonStyle">
 
@@ -29,17 +30,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imagePreview" />
 
+    <ProgressBar
+        android:layout_marginTop="15dp"
+        android:paddingVertical="5dp"
+        android:scaleY="1"
+        android:progressDrawable="@drawable/progress_rounded"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:visibility="gone"
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/tvFileName" />
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
         android:orientation="horizontal"
-        android:paddingHorizontal="25dp"
         android:weightSum="4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvFileName">
+        app:layout_constraintTop_toBottomOf="@+id/progressBar">
 
         <Button
             android:id="@+id/buttonCamera"

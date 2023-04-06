@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,9 +23,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.post_api_img.R
+import com.example.post_api_img.UploadStreamRequestBody
 import com.example.post_api_img.viewmodel.ViewModelUpload
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -51,6 +54,7 @@ class UploadFragment : Fragment() {
     private lateinit var tvImageName:TextView
     private var imgUri: Uri? = null
     private val viewModel:ViewModelUpload by activityViewModels()
+    private lateinit var progressBar:ProgressBar
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val btnCam = view.findViewById<Button>(R.id.buttonCamera)
@@ -58,38 +62,43 @@ class UploadFragment : Fragment() {
         val btnUpload = view.findViewById<Button>(R.id.buttonUpload)
         imgPreview = view.findViewById(R.id.imagePreview)
         tvImageName = view.findViewById(R.id.tvFileName)
+        progressBar = view.findViewById(R.id.progressBar)
 
+        //Camera button
         btnCam.setOnClickListener {
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             startActivityForResult(intent, CAMERA)
         }
-
+        //Gallery Button
         btnGallery.setOnClickListener {
             pickImage.launch("image/*")
         }
-
+        //UploadButton
         btnUpload.setOnClickListener {
+
             if (imgUri != null) {
                 uploadFile()
-            }else
-            {
+            }else {
                 Toast.makeText(requireContext(),"NO IMG",Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+
+
+    //Upload File To API
     private fun uploadFile(){
+
         lifecycleScope.launch {
             val stream = requireContext().contentResolver.openInputStream(imgUri!!) ?: return@launch
             val request = RequestBody.create("image/*".toMediaTypeOrNull(), stream.readBytes()) // read all bytes using kotlin extension
-            val filePart = MultipartBody.Part.createFormData(
-                "file",
-                "test.jpg",
-                request
-            )
+            val filePart = MultipartBody.Part.createFormData("file", "test.jpg", request)
+
             try {
-                Toast.makeText(requireContext(),"Im uploading here here",Toast.LENGTH_SHORT).show()
-                viewModel.upload(filePart)
+                //TODO - Get Progress Bar Here
+                Toast.makeText(requireContext(),"Im uploading here ",Toast.LENGTH_SHORT).show()
+                viewModel.urlHolder = viewModel.upload(filePart)!!.url
+
             }
             catch (e: Exception) {
                 Log.e("Output","Error during uploading = $e")
@@ -100,7 +109,7 @@ class UploadFragment : Fragment() {
         }
     }
 
-    // Create the activity result launcher
+    //get picture from gallery
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             // Get the image bitmap from the URI
@@ -170,6 +179,5 @@ class UploadFragment : Fragment() {
         }
         return name
     }
-
 
 }
