@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.MediaStore.Images
 import android.provider.OpenableColumns
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,17 +22,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.post_api_img.R
-import com.example.post_api_img.api.APIService
 import com.example.post_api_img.viewmodel.ViewModelUpload
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
 import okhttp3.RequestBody
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.util.*
 
@@ -80,7 +76,6 @@ class UploadFragment : Fragment() {
                 Toast.makeText(requireContext(),"NO IMG",Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
     private fun uploadFile(){
@@ -93,26 +88,15 @@ class UploadFragment : Fragment() {
                 request
             )
             try {
-                val retrofit = Retrofit.Builder()
-                    .baseUrl(APIService.BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(OkHttpClient.Builder().addInterceptor(HttpLoggingInterceptor().apply {
-                        level = HttpLoggingInterceptor.Level.BODY
-                    }).build())
-                    .build()
-                val apiService = retrofit.create(APIService::class.java)
-
-                Toast.makeText(requireContext(),"Im here",Toast.LENGTH_SHORT).show()
-                apiService.uploadFile(filePart)
-
-                findNavController().navigate(R.id.action_uploadFragment_to_previewFragment)
-
+                Toast.makeText(requireContext(),"Im uploading here here",Toast.LENGTH_SHORT).show()
+                viewModel.upload(filePart)
             }
             catch (e: Exception) {
                 Log.e("Output","Error during uploading = $e")
                 return@launch
             }
             Log.d("MyActivity", "on finish upload file")
+            findNavController().navigate(R.id.action_uploadFragment_to_previewFragment)
         }
     }
 
@@ -143,10 +127,12 @@ class UploadFragment : Fragment() {
             try {
                 if(data != null) {
 
-                    //Need to figure out how to get URI HERE
-
                     val imageCapture02 = data.extras?.get("data") as Bitmap
                     val filename = "Image_Capture"
+
+                    // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
+                    val tempUri: Uri = getImageUri(imageCapture02)
+                    imgUri = tempUri
 
                     imgPreview.setImageBitmap(imageCapture02)
                     tvImageName.text = filename
@@ -156,6 +142,12 @@ class UploadFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed!", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun getImageUri(inImage: Bitmap): Uri {
+        val outImage = Bitmap.createScaledBitmap(inImage, 1000, 1000, true)
+        val path = Images.Media.insertImage(requireContext().contentResolver, outImage, "Title", null)
+        return Uri.parse(path)
     }
 
     //get Filename func
@@ -178,5 +170,6 @@ class UploadFragment : Fragment() {
         }
         return name
     }
+
 
 }

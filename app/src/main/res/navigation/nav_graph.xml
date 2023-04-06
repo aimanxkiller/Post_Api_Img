@@ -18,5 +18,9 @@
         android:id="@+id/previewFragment"
         android:name="com.example.post_api_img.fragments.PreviewFragment"
         android:label="fragment_preview"
-        tools:layout="@layout/fragment_preview" />
+        tools:layout="@layout/fragment_preview" >
+        <action
+            android:id="@+id/action_previewFragment_to_uploadFragment"
+            app:destination="@id/uploadFragment" />
+    </fragment>
 </navigation>

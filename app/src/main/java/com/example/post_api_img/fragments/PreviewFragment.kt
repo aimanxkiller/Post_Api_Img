@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.post_api_img.R
 
@@ -26,11 +27,11 @@ class PreviewFragment : Fragment() {
     private var url:String? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val btnLoad:Button = view.findViewById(R.id.buttonLoad)
+        val btnRestart:Button = view.findViewById(R.id.buttonRestart)
         val inputURL:EditText = view.findViewById(R.id.etURL)
         imgPreview = view.findViewById(R.id.imageUrl)
 
         btnLoad.setOnClickListener {
-
             url = inputURL.text.toString()
             if (url != null){
             loadImg(url!!)
@@ -39,14 +40,16 @@ class PreviewFragment : Fragment() {
             }
         }
 
+        btnRestart.setOnClickListener {
+            findNavController().navigate(R.id.action_previewFragment_to_uploadFragment)
+        }
+
     }
 
     //Loads image from url to imagePreview
     private fun loadImg(url:String){
-
         Glide.with(requireContext())
             .load(url)
             .into(imgPreview)
-
     }
 }
