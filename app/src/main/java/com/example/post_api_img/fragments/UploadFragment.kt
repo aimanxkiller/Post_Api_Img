@@ -12,24 +12,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.post_api_img.R
-import com.example.post_api_img.UploadStreamRequestBody
+import com.example.post_api_img.api.UploadStreamRequestBody
 import com.example.post_api_img.viewmodel.ViewModelUpload
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import java.io.IOException
 import java.util.*
 
@@ -91,9 +85,10 @@ class UploadFragment : Fragment() {
     //Upload File To API
     private fun uploadFile(){
         progressBar.visibility = View.VISIBLE
-        progressBar.max = 10000
+        progressBar.max = 100
         progressBar.progress = 0
         lifecycleScope.launch {
+
             val stream = requireContext().contentResolver.openInputStream(imgUri!!) ?: return@launch
             val request = UploadStreamRequestBody("image/*", stream, onUploadProgress = {
                 Log.d("MyActivity", "On upload progress $it")
@@ -102,17 +97,18 @@ class UploadFragment : Fragment() {
             val filePart = MultipartBody.Part.createFormData("file", "test.jpg", request)
 
             try {
-                //TODO - Get Progress Bar Here
-                Toast.makeText(requireContext(),"Im uploading here ",Toast.LENGTH_SHORT).show()
-                viewModel.urlHolder = viewModel.upload(filePart)!!.url
-
+                viewModel.upload(filePart)
             }
             catch (e: Exception) {
                 Log.e("Output","Error during uploading = $e")
                 return@launch
             }
+
             Log.d("MyActivity", "on finish upload file")
-            findNavController().navigate(R.id.action_uploadFragment_to_previewFragment)
+            val bundle = Bundle().apply {
+                putString("ahjsgdh", viewModel.liveURL.value)
+            }
+            findNavController().navigate(R.id.action_uploadFragment_to_previewFragment,bundle)
         }
     }
 

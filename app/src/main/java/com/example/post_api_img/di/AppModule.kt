@@ -21,9 +21,6 @@ object AppModule {
         return Retrofit.Builder()
             .baseUrl(APIService.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
-            .client(OkHttpClient.Builder().addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            }).build())
             .build()
     }
 

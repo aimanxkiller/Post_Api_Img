@@ -10,13 +10,14 @@ class UploadStreamRequestBody(
     private val mediaType: String,
     private val inputStream: InputStream,
     private val onUploadProgress: (Int) -> Unit,
-) : RequestBody() {
+) : RequestBody(){
 
     override fun contentLength(): Long = inputStream.available().toLong()
 
     override fun contentType(): MediaType? = mediaType.toMediaTypeOrNull()
 
     override fun writeTo(sink: BufferedSink) {
+
         val contentLength = inputStream.available().toFloat()
         val buffer = ByteArray(DEFAULT_BUFFER_SIZE) // DEFAULT_BUFFER_SIZE constant from kotlin.io.ConstantsKt
         inputStream.use { inputStream ->
