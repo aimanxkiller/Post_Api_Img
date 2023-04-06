@@ -48,14 +48,19 @@ class UploadFragment : Fragment() {
     private var imgUri: Uri? = null
     private val viewModel:ViewModelUpload by activityViewModels()
     private lateinit var progressBar:ProgressBar
+    private lateinit var btnCam:Button
+    private lateinit var btnGallery:Button
+    private lateinit var btnUpload:Button
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val btnCam = view.findViewById<Button>(R.id.buttonCamera)
-        val btnGallery = view.findViewById<Button>(R.id.buttonGallery)
-        val btnUpload = view.findViewById<Button>(R.id.buttonUpload)
+        btnCam = view.findViewById(R.id.buttonCamera)
+        btnGallery = view.findViewById(R.id.buttonGallery)
+        btnUpload = view.findViewById(R.id.buttonUpload)
         imgPreview = view.findViewById(R.id.imagePreview)
         tvImageName = view.findViewById(R.id.tvFileName)
         progressBar = view.findViewById(R.id.progressBar)
+
+        progressBar.max = 100
 
         //Camera button
         btnCam.setOnClickListener {
@@ -70,9 +75,6 @@ class UploadFragment : Fragment() {
         btnUpload.setOnClickListener {
 
             if (imgUri != null) {
-                btnCam.visibility = View.GONE
-                btnGallery.visibility = View.GONE
-                btnUpload.visibility = View.GONE
                 uploadFile()
             }else {
                 Toast.makeText(requireContext(),"NO IMG",Toast.LENGTH_SHORT).show()
@@ -84,9 +86,7 @@ class UploadFragment : Fragment() {
 
     //Upload File To API
     private fun uploadFile(){
-        progressBar.visibility = View.VISIBLE
-        progressBar.max = 100
-        progressBar.progress = 0
+
         lifecycleScope.launch {
 
             val stream = requireContext().contentResolver.openInputStream(imgUri!!) ?: return@launch
@@ -97,19 +97,40 @@ class UploadFragment : Fragment() {
             val filePart = MultipartBody.Part.createFormData("file", "test.jpg", request)
 
             try {
+                progressLoad()
                 viewModel.upload(filePart)
             }
             catch (e: Exception) {
+                progressHide()
+                Toast.makeText(requireContext(),"Error = $e",Toast.LENGTH_SHORT).show()
                 Log.e("Output","Error during uploading = $e")
                 return@launch
             }
 
-            Log.d("MyActivity", "on finish upload file")
-            val bundle = Bundle().apply {
-                putString("passUrl", viewModel.liveURL.value)
+            viewModel.liveURL.observe(viewLifecycleOwner){
+                val bundle = Bundle().apply {
+                    putString("passUrl", it)
+                }
+                findNavController().navigate(R.id.action_uploadFragment_to_previewFragment,bundle)
             }
-            findNavController().navigate(R.id.action_uploadFragment_to_previewFragment,bundle)
+            Log.d("MyActivity", "on finish upload file")
+
         }
+    }
+    //Load ProgressBar
+    private fun progressLoad(){
+        btnCam.visibility = View.GONE
+        btnGallery.visibility = View.GONE
+        btnUpload.visibility = View.GONE
+        progressBar.visibility = View.VISIBLE
+    }
+
+    //Hide ProgressBar
+    private fun progressHide(){
+        btnCam.visibility = View.VISIBLE
+        btnGallery.visibility = View.VISIBLE
+        btnUpload.visibility = View.VISIBLE
+        progressBar.visibility = View.GONE
     }
 
     //get picture from gallery

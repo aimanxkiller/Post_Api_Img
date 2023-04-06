@@ -14,6 +14,8 @@ class ViewModelUpload @Inject constructor(
 
     var liveURL = MutableLiveData<String>()
 
+
+    //Update to handle error if fail to upload here from app schedule github
     suspend fun upload(filePart: MultipartBody.Part){
         liveURL.value = repo.uploadFile(filePart)!!.url!!
     }
