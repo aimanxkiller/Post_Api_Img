@@ -106,7 +106,7 @@ class UploadFragment : Fragment() {
 
             Log.d("MyActivity", "on finish upload file")
             val bundle = Bundle().apply {
-                putString("ahjsgdh", viewModel.liveURL.value)
+                putString("passUrl", viewModel.liveURL.value)
             }
             findNavController().navigate(R.id.action_uploadFragment_to_previewFragment,bundle)
         }

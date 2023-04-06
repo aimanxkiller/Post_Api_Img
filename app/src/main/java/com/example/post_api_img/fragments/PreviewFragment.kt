@@ -8,11 +8,9 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.post_api_img.R
-import com.example.post_api_img.viewmodel.ViewModelUpload
 
 class PreviewFragment : Fragment() {
 
@@ -27,7 +25,7 @@ class PreviewFragment : Fragment() {
     private lateinit var imgPreview:ImageView
 
     private val url:String by lazy {
-        arguments?.getString("ahjsgdh")?:""
+        arguments?.getString("passUrl")?:""
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
