@@ -87,6 +87,8 @@ class UploadFragment : Fragment() {
     //Upload File To API
     private fun uploadFile(){
 
+        var x:String? = null
+
         lifecycleScope.launch {
 
             val stream = requireContext().contentResolver.openInputStream(imgUri!!) ?: return@launch
@@ -98,22 +100,28 @@ class UploadFragment : Fragment() {
 
             try {
                 progressLoad()
-                viewModel.upload(filePart)
+                x = viewModel.uploadTest(filePart)
             }
             catch (e: Exception) {
                 progressHide()
-                Toast.makeText(requireContext(),"Error = $e",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),"Error no network connection",Toast.LENGTH_SHORT).show()
                 Log.e("Output","Error during uploading = $e")
                 return@launch
             }
 
-            viewModel.liveURL.observe(viewLifecycleOwner){
-                val bundle = Bundle().apply {
-                    putString("passUrl", it)
+            if(x.equals("success",ignoreCase = true)) {
+                viewModel.responseBody.observe(viewLifecycleOwner) {
+                    val bundle = Bundle().apply {
+                        putString("passUrl", it.url)
+                    }
+                    findNavController().navigate(
+                        R.id.action_uploadFragment_to_previewFragment,
+                        bundle
+                    )
                 }
-                findNavController().navigate(R.id.action_uploadFragment_to_previewFragment,bundle)
+            }else{
+                Toast.makeText(requireContext(),"Failed to upload",Toast.LENGTH_SHORT).show()
             }
-            Log.d("MyActivity", "on finish upload file")
 
         }
     }
