@@ -1,13 +1,16 @@
 package com.example.post_api_img.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.post_api_img.api.UploadStreamRequestBody
 import com.example.post_api_img.di.Repository
 import com.example.post_api_img.model.ImgResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
+import java.io.InputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -15,17 +18,8 @@ class ViewModelUpload @Inject constructor(
     private val repo:Repository
 ): ViewModel() {
 
-    var liveURL = MutableLiveData<String>()
-
     var responseBody = MutableLiveData<ImgResponse>()
-
-    //Update to handle error if fail to upload here from app schedule github
-    suspend fun upload(filePart: MultipartBody.Part){
-        viewModelScope.launch {
-
-        }
-        liveURL.value = repo.uploadFile(filePart).body()?.url!!
-    }
+    var progress = MutableLiveData<Int>()
 
     suspend fun uploadTest(filePart: MultipartBody.Part):String{
 
@@ -36,6 +30,32 @@ class ViewModelUpload @Inject constructor(
         }else{
             "Fail"
         }
+    }
+
+    fun uploadVM(stream: InputStream) {
+
+        viewModelScope.launch {
+            val request = UploadStreamRequestBody("image/*",stream, onUploadProgress = {
+                Log.d("MyActivity","On upload progress $it")
+                //progress here
+                progress.postValue(it)
+            })
+            val filePart = MultipartBody.Part.createFormData("file","test.jpg",request)
+            try {
+                val response = repo.uploadFile(filePart)
+
+                if(response.isSuccessful){
+                    responseBody.postValue(response.body())
+                }else{
+                    responseBody.postValue(ImgResponse())
+                }
+            }catch(e:Exception){
+                responseBody.postValue(ImgResponse())
+                Log.e("Error","Error During upload")
+            }
+        }
+
+
     }
 
 }

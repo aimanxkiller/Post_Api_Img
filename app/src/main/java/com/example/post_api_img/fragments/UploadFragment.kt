@@ -16,14 +16,10 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.post_api_img.R
-import com.example.post_api_img.api.UploadStreamRequestBody
 import com.example.post_api_img.viewmodel.ViewModelUpload
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import okhttp3.MultipartBody
 import java.io.IOException
 import java.util.*
 
@@ -60,6 +56,7 @@ class UploadFragment : Fragment() {
         tvImageName = view.findViewById(R.id.tvFileName)
         progressBar = view.findViewById(R.id.progressBar)
 
+        imgUri = null
         progressBar.max = 100
 
         //Camera button
@@ -77,6 +74,7 @@ class UploadFragment : Fragment() {
         btnUpload.setOnClickListener {
             if (imgUri != null) {
                 uploadFile()
+                progressLoad()
             }else {
                 Toast.makeText(requireContext(),"NO IMG",Toast.LENGTH_SHORT).show()
             }
@@ -86,45 +84,69 @@ class UploadFragment : Fragment() {
 
     //Upload File To API
     private fun uploadFile(){
-        var x: String?
 
         // TODO - Pass stream to viewmodel and do API calling and handling inside viewmodel
 
-        lifecycleScope.launch {
+        val stream2 = requireContext().contentResolver.openInputStream(imgUri!!)!!
 
-            val stream = requireContext().contentResolver.openInputStream(imgUri!!) ?: return@launch
-            val request = UploadStreamRequestBody("image/*", stream, onUploadProgress = {
-                Log.d("MyActivity", "On upload progress $it")
-                progressBar.progress = it // Some ProgressBar
-            })
-            val filePart = MultipartBody.Part.createFormData("file", "test.jpg", request)
+        viewModel.uploadVM(stream2)
 
-            try {
-                progressLoad()
-                x = viewModel.uploadTest(filePart)
-            }
-            catch (e: Exception) {
-                progressHide()
-                Toast.makeText(requireContext(),"Error no network connection",Toast.LENGTH_SHORT).show()
-                Log.e("Output","Error during uploading = $e")
-                return@launch
-            }
-
-            if(x.equals("success",ignoreCase = true)) {
-                viewModel.responseBody.observe(viewLifecycleOwner) {
-                    val bundle = Bundle().apply {
+        viewModel.progress.observe(viewLifecycleOwner){
+            progressBar.progress = it
+        }
+        viewModel.responseBody.observe(viewLifecycleOwner){
+            if (it.url != null){
+                val bundle = Bundle().apply {
                         putString("passUrl", it.url)
                     }
                     findNavController().navigate(
                         R.id.action_uploadFragment_to_previewFragment,
                         bundle
                     )
-                }
-            }else{
-                Toast.makeText(requireContext(),"Failed to upload",Toast.LENGTH_SHORT).show()
+            }
+            else{
+                progressHide()
+                Toast.makeText(requireContext(),"Error no network connection",Toast.LENGTH_SHORT).show()
             }
 
+
         }
+
+//        lifecycleScope.launch {
+//
+//            val stream = requireContext().contentResolver.openInputStream(imgUri!!) ?: return@launch
+//            val request = UploadStreamRequestBody("image/*", stream, onUploadProgress = {
+//                Log.d("MyActivity", "On upload progress $it")
+//                progressBar.progress = it // Some ProgressBar
+//            })
+//            val filePart = MultipartBody.Part.createFormData("file", "test.jpg", request)
+//
+//            try {
+//                progressLoad()
+//                x = viewModel.uploadTest(filePart)
+//            }
+//            catch (e: Exception) {
+//                progressHide()
+//                Toast.makeText(requireContext(),"Error no network connection",Toast.LENGTH_SHORT).show()
+//                Log.e("Output","Error during uploading = $e")
+//                return@launch
+//            }
+//
+//            if(x.equals("success",ignoreCase = true)) {
+//                viewModel.responseBody.observe(viewLifecycleOwner) {
+//                    val bundle = Bundle().apply {
+//                        putString("passUrl", it.url)
+//                    }
+//                    findNavController().navigate(
+//                        R.id.action_uploadFragment_to_previewFragment,
+//                        bundle
+//                    )
+//                }
+//            }else{
+//                Toast.makeText(requireContext(),"Failed to upload",Toast.LENGTH_SHORT).show()
+//            }
+//
+//        }
 
     }
 

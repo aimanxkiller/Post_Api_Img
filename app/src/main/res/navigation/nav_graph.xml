@@ -12,7 +12,8 @@
         tools:layout="@layout/fragment_upload" >
         <action
             android:id="@+id/action_uploadFragment_to_previewFragment"
-            app:destination="@id/previewFragment" />
+            app:destination="@id/previewFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/previewFragment"
