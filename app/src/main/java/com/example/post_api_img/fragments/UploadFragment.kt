@@ -20,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.post_api_img.R
 import com.example.post_api_img.viewmodel.ViewModelUpload
 import dagger.hilt.android.AndroidEntryPoint
+import okhttp3.internal.wait
 import java.io.IOException
 import java.util.*
 
@@ -106,10 +107,8 @@ class UploadFragment : Fragment() {
             }
             else{
                 progressHide()
-                Toast.makeText(requireContext(),"Error no network connection",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),"${it.fileName}",Toast.LENGTH_SHORT).show()
             }
-
-
         }
 
 //        lifecycleScope.launch {

@@ -13,7 +13,7 @@
         <action
             android:id="@+id/action_uploadFragment_to_previewFragment"
             app:destination="@id/previewFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/previewFragment"

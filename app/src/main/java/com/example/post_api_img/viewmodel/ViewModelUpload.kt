@@ -47,10 +47,10 @@ class ViewModelUpload @Inject constructor(
                 if(response.isSuccessful){
                     responseBody.postValue(response.body())
                 }else{
-                    responseBody.postValue(ImgResponse())
+                    responseBody.postValue(ImgResponse(fileName = "Error during uploading"))
                 }
             }catch(e:Exception){
-                responseBody.postValue(ImgResponse())
+                responseBody.postValue(ImgResponse(fileName = "Error during uploading"))
                 Log.e("Error","Error During upload")
             }
         }
