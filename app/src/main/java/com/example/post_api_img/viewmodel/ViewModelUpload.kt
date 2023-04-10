@@ -2,9 +2,11 @@ package com.example.post_api_img.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.post_api_img.di.Repository
 import com.example.post_api_img.model.ImgResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
@@ -19,6 +21,9 @@ class ViewModelUpload @Inject constructor(
 
     //Update to handle error if fail to upload here from app schedule github
     suspend fun upload(filePart: MultipartBody.Part){
+        viewModelScope.launch {
+
+        }
         liveURL.value = repo.uploadFile(filePart).body()?.url!!
     }
 

@@ -38,7 +38,8 @@ class PreviewFragment : Fragment() {
         loadImg(urlPlaceholder.text.toString())
 
         btnRestart.setOnClickListener {
-            findNavController().popBackStack(findNavController().graph.startDestinationId,false)
+            findNavController().navigate(R.id.action_previewFragment_to_uploadFragment)
+            //findNavController().popBackStack(findNavController().graph.startDestinationId,false)
         }
 
     }

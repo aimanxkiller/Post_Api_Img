@@ -67,27 +67,28 @@ class UploadFragment : Fragment() {
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             startActivityForResult(intent, CAMERA)
         }
+
         //Gallery Button
         btnGallery.setOnClickListener {
             pickImage.launch("image/*")
         }
+
         //UploadButton
         btnUpload.setOnClickListener {
-
             if (imgUri != null) {
                 uploadFile()
             }else {
                 Toast.makeText(requireContext(),"NO IMG",Toast.LENGTH_SHORT).show()
             }
         }
+
     }
-
-
 
     //Upload File To API
     private fun uploadFile(){
+        var x: String?
 
-        var x:String? = null
+        // TODO - Pass stream to viewmodel and do API calling and handling inside viewmodel
 
         lifecycleScope.launch {
 
@@ -124,7 +125,9 @@ class UploadFragment : Fragment() {
             }
 
         }
+
     }
+
     //Load ProgressBar
     private fun progressLoad(){
         btnCam.visibility = View.GONE
